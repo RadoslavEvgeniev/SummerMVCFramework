@@ -48,4 +48,8 @@ public class DependencyContainer {
 
         return null;
     }
+
+    public void evictCachedStaticStates() {
+        this.cachedStaticStateClasses.clear();
+    }
 }
