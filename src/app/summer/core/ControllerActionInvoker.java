@@ -1,9 +1,12 @@
 package app.summer.core;
 
+import app.broccolina.solet.HttpSoletRequest;
+import app.broccolina.solet.HttpSoletResponse;
 import app.javache.http.HttpSession;
 import app.summer.api.Model;
 import app.summer.util.ControllerActionPair;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -135,7 +138,7 @@ public class ControllerActionInvoker {
                             parameterValue = URLDecoder.decode(request.getBodyParameters().get(field.getName()), "UTF-8");
                             Object parsedParameterValue = this.parseValue(field.getType(), parameterValue);
                             field.set(bindingModel, parsedParameterValue);
-                        } catch (IllegalAccessException e) {
+                        } catch (IllegalAccessException | UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
                     }
@@ -166,7 +169,7 @@ public class ControllerActionInvoker {
             } else if (this.isBindingModel(currentParameter)) {
                 Object bindingModel = this.instantiateBindingModel(currentParameter);
 
-                this.populateBindingModel(bindingModel, this.dependencyContainer.getObject(HttpSoletRequest.class.getSimpleName()));
+                this.populateBindingModel(bindingModel, (HttpSoletRequest) this.dependencyContainer.getObject(HttpSoletRequest.class.getSimpleName()));
 
                 actionArguments[i] = bindingModel;
             }

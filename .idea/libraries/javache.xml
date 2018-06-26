@@ -2,6 +2,7 @@
   <library name="javache">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/javache.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/soletapi.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
