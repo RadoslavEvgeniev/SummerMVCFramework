@@ -9,13 +9,13 @@ public class ControllerActionPair {
 
     private Object controller;
 
-    private Method method;
+    private Method action;
 
     private Set<Object> parameters;
 
-    public ControllerActionPair(Object controller, Method method) {
+    public ControllerActionPair(Object controller, Method action) {
         this.setController(controller);
-        this.setMethod(method);
+        this.setAction(action);
         this.parameters = new LinkedHashSet<>();
     }
 
@@ -27,12 +27,12 @@ public class ControllerActionPair {
         this.controller = controller;
     }
 
-    public Method getMethod() {
-        return this.method;
+    public Method getAction() {
+        return this.action;
     }
 
-    private void setMethod(Method method) {
-        this.method = method;
+    private void setAction(Method action) {
+        this.action = action;
     }
 
     public Set<Object> getParameters() {

@@ -32,7 +32,7 @@ public class TemplateEngine {
     }
 
     public String loadTemplate(String templateName) throws IOException {
-        return this.loadTemplate(templateName, new Model());
+        return this.loadTemplate(templateName, this.getNewModel());
     }
 
     public String loadTemplate(String templateName, Model model) throws IOException {

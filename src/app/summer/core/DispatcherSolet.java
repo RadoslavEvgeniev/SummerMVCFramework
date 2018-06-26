@@ -42,12 +42,12 @@ public class DispatcherSolet extends BaseHttpSolet {
                 .entrySet()
                 .stream()
                 .filter(action -> {
-                    Pattern routePattern = Pattern.compile(action.getKey());
+                    Pattern routePattern = Pattern.compile("^" + action.getKey() + "$");
                     Matcher routeMatcher = routePattern.matcher(request.getRequestUrl());
 
                     if (routeMatcher.find()) {
                         List<Parameter> pathVariables = Arrays
-                                .stream(action.getValue().getMethod().getParameters())
+                                .stream(action.getValue().getAction().getParameters())
                                 .filter(parameter -> parameter.isAnnotationPresent(PathVariable.class))
                                 .collect(Collectors.toList());
 

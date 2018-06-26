@@ -179,12 +179,16 @@ public class ControllerActionInvoker {
     }
 
     public Object invokeAction(ControllerActionPair controllerActionPair) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Object[] actionArguments = this.getActionArguments(controllerActionPair.getMethod(), controllerActionPair.getParameters());
+        Object[] actionArguments = this.getActionArguments(controllerActionPair.getAction(), controllerActionPair.getParameters());
 
+        Object actionResult = null;
         if (actionArguments.length > 0) {
-            return controllerActionPair.getMethod().invoke(controllerActionPair.getController(), actionArguments);
+            actionResult = controllerActionPair.getAction().invoke(controllerActionPair.getController(), actionArguments);
         } else {
-            return controllerActionPair.getMethod().invoke(controllerActionPair.getController());
+            actionResult = controllerActionPair.getAction().invoke(controllerActionPair.getController());
         }
+
+        controllerActionPair.clearParameters();
+        return actionResult;
     }
 }

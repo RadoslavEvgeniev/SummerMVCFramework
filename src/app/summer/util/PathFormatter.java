@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class PathFormatter {
 
-    private static final String PATH_PARAMETER_PATTERN = "\\{([a-zA-Z]+)}";
+    private static final String PATH_PARAMETER_PATTERN = "\\{([a-zA-Z]+)\\}";
 
     private static final String PATH_PARSED_PARAMETER_PATTERN = "(?<group-name>[a-zA-Z0-9_-]+)";
 
