@@ -39,7 +39,7 @@ public class TemplateEngine {
         String templateContent = String.join("", Files.readAllLines(Paths.get(applicationsTemplateFolder + templateName + TEMPLATE_FILE_EXTENSION)));
 
         if (model != null) {
-            templateContent = this.renderTemplate(templateName, model);
+            templateContent = this.renderTemplate(templateContent, model);
         }
 
         return templateContent;
