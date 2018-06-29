@@ -3,6 +3,7 @@ package app.summer.core;
 import app.broccolina.solet.HttpSoletRequest;
 import app.broccolina.solet.HttpSoletResponse;
 import app.javache.http.HttpSession;
+import app.summer.api.BindingResult;
 import app.summer.api.Model;
 import app.summer.util.ControllerActionPair;
 
@@ -101,11 +102,22 @@ public class ControllerActionInvoker {
                 !this.isHttpSoletRequest(parameter) &&
                 !this.isHttpSoletResponse(parameter) &&
                 !this.isHttpSession(parameter) &&
-                !this.isModel(parameter);
+                !this.isModel(parameter) &&
+                !this.isBindingResult(parameter);
     }
 
     private boolean isPathVariable(Parameter parameter) {
         return this.isPrimitive(parameter) || this.isWrapper(parameter) || this.isString(parameter);
+    }
+
+    private boolean isBindingResult(Parameter parameter) {
+        if (parameter == null) {
+            return false;
+        }
+
+        String parameterTypeName = parameter.getType().getSimpleName();
+
+        return parameterTypeName.equals(BindingResult.class.getSimpleName());
     }
 
     private Object parseValue(Class<?> type, String value) {
@@ -127,22 +139,40 @@ public class ControllerActionInvoker {
     }
 
     private void populateBindingModel(Object bindingModel, HttpSoletRequest request) {
-        Arrays.stream(bindingModel.getClass().getDeclaredFields()).
-                forEach(field -> {
-                    field.setAccessible(true);
+        try {
+            Arrays.stream(bindingModel.getClass().getDeclaredFields()).
+                    forEach(field -> {
+                        field.setAccessible(true);
 
-                    if (request.getBodyParameters().containsKey(field.getName())) {
-                        String parameterValue = null;
+                        if (request.getBodyParameters().containsKey(field.getName())) {
+                            String parameterValue = null;
+
+                            try {
+                                parameterValue = URLDecoder.decode(request.getBodyParameters().get(field.getName()), "UTF-8");
+                                Object parsedParameterValue = this.parseValue(field.getType(), parameterValue);
+                                field.set(bindingModel, parsedParameterValue);
+                            } catch (IllegalAccessException | UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+            BindingResult bindingResult = (BindingResult) this.dependencyContainer.getObject(BindingResult.class.getSimpleName());
+
+            Arrays.stream(bindingModel.getClass().getDeclaredFields()).
+                    forEach(field -> {
+                        field.setAccessible(true);
 
                         try {
-                            parameterValue = URLDecoder.decode(request.getBodyParameters().get(field.getName()), "UTF-8");
-                            Object parsedParameterValue = this.parseValue(field.getType(), parameterValue);
-                            field.set(bindingModel, parsedParameterValue);
-                        } catch (IllegalAccessException | UnsupportedEncodingException e) {
+                            if (field.get(bindingModel) == null) {
+                                bindingResult.addError(String.format("Mapping of \"%s\" field failed", field.getName()));
+                            }
+                        } catch (IllegalAccessException e) {
                             e.printStackTrace();
                         }
-                    }
-                });
+                    });
+        } catch (Exception ignored) {
+            ;
+        }
     }
 
     private Object[] getActionArguments(Method action, Set<Object> parameters) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -172,6 +202,10 @@ public class ControllerActionInvoker {
                 this.populateBindingModel(bindingModel, (HttpSoletRequest) this.dependencyContainer.getObject(HttpSoletRequest.class.getSimpleName()));
 
                 actionArguments[i] = bindingModel;
+            } else if (this.isBindingResult(currentParameter)) {
+                Object bindingResult = this.dependencyContainer.getObject(BindingResult.class.getSimpleName());
+
+                actionArguments[i] = bindingResult;
             }
         }
 

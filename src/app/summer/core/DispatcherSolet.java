@@ -3,6 +3,7 @@ package app.summer.core;
 import app.broccolina.solet.*;
 import app.javache.http.HttpSession;
 import app.javache.http.HttpStatus;
+import app.summer.api.BindingResult;
 import app.summer.api.Model;
 import app.summer.api.PathVariable;
 import app.summer.util.ControllerActionPair;
@@ -155,6 +156,8 @@ public class DispatcherSolet extends BaseHttpSolet {
         if (request.getSession() != null) {
             this.dependencyContainer.addInstantiatedObject(HttpSession.class.getSimpleName(), request.getSession());
         }
+
+        this.dependencyContainer.addInstantiatedObject(BindingResult.class.getSimpleName(), new BindingResult());
 
         super.service(request, response);
 
