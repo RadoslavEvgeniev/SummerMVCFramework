@@ -204,7 +204,6 @@ public class ControllerActionInvoker {
                 actionArguments[i] = bindingModel;
             } else if (this.isBindingResult(currentParameter)) {
                 Object bindingResult = this.dependencyContainer.getObject(BindingResult.class.getSimpleName());
-
                 actionArguments[i] = bindingResult;
             }
         }
